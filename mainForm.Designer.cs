@@ -51,9 +51,6 @@
             suffixFileName = new Label();
             boxCompressionSettings = new GroupBox();
             compressionPanel = new Panel();
-            label4 = new Label();
-            label3 = new Label();
-            label2 = new Label();
             valueTargetFileSize = new NumericUpDown();
             suffixTargetPercentage2 = new Label();
             suffixTargetPercentage = new TextBox();
@@ -333,9 +330,6 @@
             // compressionPanel
             // 
             compressionPanel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            compressionPanel.Controls.Add(label4);
-            compressionPanel.Controls.Add(label3);
-            compressionPanel.Controls.Add(label2);
             compressionPanel.Controls.Add(valueTargetFileSize);
             compressionPanel.Controls.Add(suffixTargetPercentage2);
             compressionPanel.Controls.Add(suffixTargetPercentage);
@@ -348,40 +342,6 @@
             compressionPanel.Name = "compressionPanel";
             compressionPanel.Size = new Size(611, 101);
             compressionPanel.TabIndex = 0;
-            // 
-            // label4
-            // 
-            label4.Font = new Font("Segoe UI", 7F);
-            label4.ForeColor = SystemColors.GrayText;
-            label4.Location = new Point(322, 83);
-            label4.Name = "label4";
-            label4.Padding = new Padding(0, 0, 5, 0);
-            label4.Size = new Size(51, 16);
-            label4.TabIndex = 11;
-            label4.Text = "Medium";
-            label4.TextAlign = ContentAlignment.TopCenter;
-            // 
-            // label3
-            // 
-            label3.Font = new Font("Segoe UI", 7F);
-            label3.ForeColor = SystemColors.GrayText;
-            label3.Location = new Point(481, 83);
-            label3.Name = "label3";
-            label3.Padding = new Padding(0, 0, 5, 0);
-            label3.Size = new Size(51, 16);
-            label3.TabIndex = 10;
-            label3.Text = "Low";
-            label3.TextAlign = ContentAlignment.TopRight;
-            // 
-            // label2
-            // 
-            label2.Font = new Font("Segoe UI", 7F);
-            label2.ForeColor = SystemColors.GrayText;
-            label2.Location = new Point(163, 83);
-            label2.Name = "label2";
-            label2.Size = new Size(51, 16);
-            label2.TabIndex = 9;
-            label2.Text = "High";
             // 
             // valueTargetFileSize
             // 
@@ -463,6 +423,7 @@
             lblTargetPercentage.TabIndex = 1;
             lblTargetPercentage.Text = "Retain % of target file size:";
             lblTargetPercentage.TextAlign = ContentAlignment.MiddleLeft;
+            formTip.SetToolTip(lblTargetPercentage, "How much in percent of the original file should be retained?\r\n\r\nA value of 90% will retain 90% of the file, and apply 10% compression. May not be 100% accurate.\r\n");
             // 
             // lblTargetFileSize
             // 
@@ -576,8 +537,8 @@
             ClientSize = new Size(653, 493);
             Controls.Add(separatorPanel1);
             Controls.Add(topPanel);
-            Controls.Add(optionsPanel);
             Controls.Add(dropPanel);
+            Controls.Add(optionsPanel);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
@@ -634,9 +595,6 @@
         private NumericUpDown valueTargetFileSize;
         private CheckBox chkUseSourceDir;
         private Button btnReset;
-        private Label label2;
-        private Label label3;
-        private Label label4;
         private ToolTip formTip;
         private Button btnFetchFileName;
         private Label lblTimestampFormat;
