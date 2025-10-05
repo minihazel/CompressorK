@@ -283,7 +283,7 @@
             chkIncludeTimestamp.Size = new Size(190, 19);
             chkIncludeTimestamp.TabIndex = 7;
             chkIncludeTimestamp.Text = "Include timestamp in file name";
-            formTip.SetToolTip(chkIncludeTimestamp, "Include the current timestamp into the name of the converted video");
+            formTip.SetToolTip(chkIncludeTimestamp, "Include the current timestamp into the name of the converted video.\r\n\r\nIf \"File name\" is empty, this has no effect.");
             chkIncludeTimestamp.UseVisualStyleBackColor = true;
             chkIncludeTimestamp.CheckedChanged += chkIncludeTimestamp_CheckedChanged;
             // 
