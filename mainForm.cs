@@ -168,6 +168,17 @@ namespace CompressorK
 
         private void valueTargetPercentage_Scroll(object sender, EventArgs e)
         {
+            int currentValue = valueTargetPercentage.Value;
+            int snapIncrement = 10;
+
+            int snappedValue = (int)Math.Round((double)currentValue / snapIncrement) * snapIncrement;
+
+            if (snappedValue < valueTargetPercentage.Minimum)
+                snappedValue = valueTargetPercentage.Minimum;
+            else if (snappedValue > valueTargetPercentage.Maximum)
+                snappedValue = valueTargetPercentage.Maximum;
+
+            valueTargetPercentage.Value = snappedValue;
             suffixTargetPercentage.Text = valueTargetPercentage.Value.ToString();
         }
 
@@ -568,6 +579,26 @@ namespace CompressorK
         private void warningNotice_Click(object sender, EventArgs e)
         {
             OpenUrl("https://www.ffmpeg.org/download.html");
+        }
+
+        private void valueTargetPercentage_MouseDown(object sender, MouseEventArgs e)
+        {
+            int trackWidth = valueTargetPercentage.Width;
+            int max = valueTargetPercentage.Maximum;
+            int min = valueTargetPercentage.Minimum;
+
+            double estimatedValue = (double)(e.X) / trackWidth * (max - min) + min;
+            int snapIncrement = 10;
+
+            int snappedValue = (int)Math.Round(estimatedValue / snapIncrement) * snapIncrement;
+
+            if (snappedValue < min)
+                snappedValue = min;
+            else if (snappedValue > max)
+                snappedValue = max;
+
+            valueTargetPercentage.Value = snappedValue;
+            suffixTargetPercentage.Text = snappedValue.ToString();
         }
     }
 }

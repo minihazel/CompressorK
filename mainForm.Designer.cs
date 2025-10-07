@@ -405,6 +405,7 @@
             valueTargetPercentage.Value = 1;
             valueTargetPercentage.Scroll += valueTargetPercentage_Scroll;
             valueTargetPercentage.ValueChanged += valueTargetPercentage_ValueChanged;
+            valueTargetPercentage.MouseDown += valueTargetPercentage_MouseDown;
             // 
             // suffixTargetFileSize
             // 
