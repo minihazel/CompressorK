@@ -675,6 +675,7 @@ namespace CompressorK
                 chkUseSourceFileName.Checked = true;
                 chkIncludeTimestamp.Checked = false;
                 chkOpenSourceDir.Checked = true;
+                chkDisplayConfirmation.Checked = true;
 
                 btnFetchFileName.Enabled = false;
                 btnBrowseOutputFolder.Enabled = false;
