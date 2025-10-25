@@ -213,7 +213,6 @@ namespace CompressorK
                 {
                     valueOutputFolder.Text = Properties.Settings.Default.globalOutputPath;
                 }
-
             }
         }
 

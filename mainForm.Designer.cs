@@ -33,6 +33,7 @@
             dropPanel = new Panel();
             btnReset = new Button();
             boxProgress = new GroupBox();
+            chkFocusWindow = new CheckBox();
             chkOpenSourceDir = new CheckBox();
             btnQuitApp = new Button();
             btnCompressVideo = new Button();
@@ -69,8 +70,6 @@
             warningNotice = new Label();
             label1 = new Label();
             formTip = new ToolTip(components);
-            checkBox1 = new CheckBox();
-            chkFocusWindow = new CheckBox();
             dropPanel.SuspendLayout();
             boxProgress.SuspendLayout();
             boxFileProperties.SuspendLayout();
@@ -123,6 +122,19 @@
             boxProgress.TabIndex = 6;
             boxProgress.TabStop = false;
             boxProgress.Text = " Settings ";
+            // 
+            // chkFocusWindow
+            // 
+            chkFocusWindow.Checked = true;
+            chkFocusWindow.CheckState = CheckState.Checked;
+            chkFocusWindow.Cursor = Cursors.Hand;
+            chkFocusWindow.Location = new Point(9, 48);
+            chkFocusWindow.Name = "chkFocusWindow";
+            chkFocusWindow.Size = new Size(270, 23);
+            chkFocusWindow.TabIndex = 8;
+            chkFocusWindow.Text = "Focus window on completion";
+            formTip.SetToolTip(chkFocusWindow, "Bring the app window up when the download is finished");
+            chkFocusWindow.UseVisualStyleBackColor = true;
             // 
             // chkOpenSourceDir
             // 
@@ -342,7 +354,6 @@
             // compressionPanel
             // 
             compressionPanel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            compressionPanel.Controls.Add(checkBox1);
             compressionPanel.Controls.Add(prefixPresets);
             compressionPanel.Controls.Add(listPresets);
             compressionPanel.Controls.Add(valueTargetFileSize);
@@ -563,31 +574,6 @@
             // 
             formTip.ToolTipTitle = "CompressorK";
             // 
-            // checkBox1
-            // 
-            checkBox1.AutoSize = true;
-            checkBox1.Cursor = Cursors.Hand;
-            checkBox1.Location = new Point(478, 36);
-            checkBox1.Name = "checkBox1";
-            checkBox1.Size = new Size(146, 19);
-            checkBox1.TabIndex = 11;
-            checkBox1.Text = "Use software encoding";
-            formTip.SetToolTip(checkBox1, "Toggle between targeting a specific file size or targeting how much compression in percent should be applied");
-            checkBox1.UseVisualStyleBackColor = true;
-            // 
-            // chkFocusWindow
-            // 
-            chkFocusWindow.Checked = true;
-            chkFocusWindow.CheckState = CheckState.Checked;
-            chkFocusWindow.Cursor = Cursors.Hand;
-            chkFocusWindow.Location = new Point(9, 48);
-            chkFocusWindow.Name = "chkFocusWindow";
-            chkFocusWindow.Size = new Size(270, 23);
-            chkFocusWindow.TabIndex = 8;
-            chkFocusWindow.Text = "Focus window on completion";
-            formTip.SetToolTip(chkFocusWindow, "Bring the app window up when the download is finished");
-            chkFocusWindow.UseVisualStyleBackColor = true;
-            // 
             // mainForm
             // 
             AllowDrop = true;
@@ -662,7 +648,6 @@
         private CheckBox chkUseSourceFileName;
         private ComboBox listPresets;
         private Label prefixPresets;
-        private CheckBox checkBox1;
         private CheckBox chkFocusWindow;
     }
 }
