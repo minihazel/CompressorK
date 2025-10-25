@@ -31,10 +31,11 @@
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(mainForm));
             dropPanel = new Panel();
+            statusProgress = new Label();
             btnReset = new Button();
             boxProgress = new GroupBox();
+            checkBox1 = new CheckBox();
             chkOpenSourceDir = new CheckBox();
-            statusProgress = new Label();
             btnQuitApp = new Button();
             btnCompressVideo = new Button();
             boxFileProperties = new GroupBox();
@@ -82,6 +83,7 @@
             // dropPanel
             // 
             dropPanel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            dropPanel.Controls.Add(statusProgress);
             dropPanel.Controls.Add(btnReset);
             dropPanel.Controls.Add(boxProgress);
             dropPanel.Controls.Add(btnQuitApp);
@@ -93,13 +95,26 @@
             dropPanel.Size = new Size(629, 422);
             dropPanel.TabIndex = 0;
             // 
+            // statusProgress
+            // 
+            statusProgress.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            statusProgress.BackColor = Color.Transparent;
+            statusProgress.Font = new Font("Segoe UI", 10F);
+            statusProgress.Location = new Point(326, 380);
+            statusProgress.Name = "statusProgress";
+            statusProgress.Size = new Size(49, 20);
+            statusProgress.TabIndex = 5;
+            statusProgress.Text = "50%";
+            statusProgress.TextAlign = ContentAlignment.MiddleCenter;
+            statusProgress.Visible = false;
+            // 
             // btnReset
             // 
             btnReset.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             btnReset.Cursor = Cursors.Hand;
             btnReset.Font = new Font("Segoe UI", 11F);
             btnReset.ForeColor = SystemColors.ControlText;
-            btnReset.Location = new Point(423, 326);
+            btnReset.Location = new Point(402, 326);
             btnReset.Name = "btnReset";
             btnReset.Size = new Size(39, 39);
             btnReset.TabIndex = 7;
@@ -111,14 +126,27 @@
             // boxProgress
             // 
             boxProgress.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            boxProgress.Controls.Add(checkBox1);
             boxProgress.Controls.Add(chkOpenSourceDir);
-            boxProgress.Controls.Add(statusProgress);
             boxProgress.Location = new Point(3, 326);
             boxProgress.Name = "boxProgress";
             boxProgress.Size = new Size(285, 84);
             boxProgress.TabIndex = 6;
             boxProgress.TabStop = false;
             boxProgress.Text = " Settings ";
+            // 
+            // checkBox1
+            // 
+            checkBox1.Checked = true;
+            checkBox1.CheckState = CheckState.Checked;
+            checkBox1.Cursor = Cursors.Hand;
+            checkBox1.Location = new Point(9, 51);
+            checkBox1.Name = "checkBox1";
+            checkBox1.Size = new Size(270, 23);
+            checkBox1.TabIndex = 8;
+            checkBox1.Text = "Notify me when finished";
+            formTip.SetToolTip(checkBox1, "Notify the user when the download is complete");
+            checkBox1.UseVisualStyleBackColor = true;
             // 
             // chkOpenSourceDir
             // 
@@ -133,24 +161,14 @@
             formTip.SetToolTip(chkOpenSourceDir, "Open the output folder and select the converted video upon completion");
             chkOpenSourceDir.UseVisualStyleBackColor = true;
             // 
-            // statusProgress
-            // 
-            statusProgress.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            statusProgress.Location = new Point(6, 51);
-            statusProgress.Name = "statusProgress";
-            statusProgress.Size = new Size(273, 23);
-            statusProgress.TabIndex = 5;
-            statusProgress.TextAlign = ContentAlignment.MiddleCenter;
-            statusProgress.Visible = false;
-            // 
             // btnQuitApp
             // 
             btnQuitApp.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             btnQuitApp.Cursor = Cursors.Hand;
             btnQuitApp.ForeColor = Color.IndianRed;
-            btnQuitApp.Location = new Point(468, 326);
+            btnQuitApp.Location = new Point(447, 326);
             btnQuitApp.Name = "btnQuitApp";
-            btnQuitApp.Size = new Size(158, 39);
+            btnQuitApp.Size = new Size(179, 39);
             btnQuitApp.TabIndex = 4;
             btnQuitApp.Text = "❌ Quit";
             formTip.SetToolTip(btnQuitApp, "Quit the app");
@@ -162,9 +180,9 @@
             btnCompressVideo.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             btnCompressVideo.Cursor = Cursors.Hand;
             btnCompressVideo.Font = new Font("Segoe UI", 9F);
-            btnCompressVideo.Location = new Point(468, 371);
+            btnCompressVideo.Location = new Point(447, 371);
             btnCompressVideo.Name = "btnCompressVideo";
-            btnCompressVideo.Size = new Size(158, 39);
+            btnCompressVideo.Size = new Size(179, 39);
             btnCompressVideo.TabIndex = 3;
             btnCompressVideo.Text = "✔️ Compress video";
             formTip.SetToolTip(btnCompressVideo, "Begin compressing the video");
@@ -601,5 +619,6 @@
         private Label lblTimestampFormat;
         private Label warningNotice;
         private Button btnResetWarning;
+        private CheckBox checkBox1;
     }
 }

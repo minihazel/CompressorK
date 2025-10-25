@@ -1,7 +1,8 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Xabe.FFmpeg;
+using Timer = System.Windows.Forms.Timer;
 
 namespace CompressorK
 {
@@ -362,13 +363,22 @@ namespace CompressorK
             btnReset.Enabled = false;
             btnCompressVideo.Enabled = false;
 
-            statusProgress.Visible = true;
-            statusProgress.Text = "Compressing...";
+            btnCompressVideo.Text = "Compressing...";
 
             try
             {
                 await compressionTask();
-                statusProgress.Text = "Compression complete";
+
+                btnCompressVideo.Text = "✔️ Compress video";
+                topPanel.BackColor = Color.MediumSpringGreen;
+
+                Timer tmr = new Timer();
+                tmr.Interval = 3000;
+
+                tmr.Tick += (_,_) =>
+                {
+                    topPanel.BackColor = SystemColors.ScrollBar;
+                };
 
                 btnCompressVideo.Enabled = true;
                 btnQuitApp.Enabled = true;
@@ -380,11 +390,10 @@ namespace CompressorK
                 }
 
                 await Task.Delay(3000);
-                statusProgress.Visible = false;
             }
             catch (Exception ex)
             {
-                statusProgress.Text = "Compression failed, see logs.txt";
+                btnCompressVideo.Text = "Compression failed, see logs.txt";
             }
         }
 
@@ -394,7 +403,7 @@ namespace CompressorK
             {
                 Invoke(new Action(() =>
                 {
-                    statusProgress.Text = $"{percent}% done";
+                    btnCompressVideo.Text = $"{percent}%";
                 }));
             }
         }
@@ -460,8 +469,7 @@ namespace CompressorK
                 chkOpenSourceDir.Checked = false;
 
                 valueOutputFolder.Text = string.Empty;
-                statusProgress.Text = string.Empty;
-                statusProgress.Visible = false;
+                btnCompressVideo.Text = "✔️ Compress video"; ;
 
                 compressor = null;
                 optionsPanel.BringToFront();
@@ -509,8 +517,9 @@ namespace CompressorK
             string fullFileName = currentVideoFile.Text;
             if (string.IsNullOrEmpty(fullFileName)) return;
 
+            string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fullFileName);
             string fileExtension = Path.GetExtension(fullFileName);
-            valueFileName.Text = fullFileName;
+            valueFileName.Text = fileNameWithoutExtension;
             suffixFileName.Text = fileExtension;
         }
 
