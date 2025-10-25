@@ -206,6 +206,8 @@ namespace CompressorK
                 Properties.Settings.Default.Save();
 
                 chkUseFileSize.Checked = Properties.Settings.Default.compressionMethod;
+                chkDisplayConfirmation.Checked = Properties.Settings.Default.displayConfirmation;
+
                 if (string.IsNullOrEmpty(Properties.Settings.Default.globalOutputPath)) return;
 
                 bool directoryExists = Directory.Exists(Properties.Settings.Default.globalOutputPath);
@@ -379,15 +381,32 @@ namespace CompressorK
                     trimmedFileName = valueFileName.Text + suffixFileName.Text;
                 }
 
-                string content = "Compress \"" + currentVideoFile.Text + $"\"" +
-                    Environment.NewLine +
-                    Environment.NewLine +
-                    "into" +
-                    Environment.NewLine +
-                    Environment.NewLine +
-                    $"\"{trimmedFileName}\"?";
+                if (chkDisplayConfirmation.Checked)
+                {
 
-                if (MessageBox.Show(content, Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                    string content = "Compress \"" + currentVideoFile.Text + $"\"" +
+                        Environment.NewLine +
+                        Environment.NewLine +
+                        "into" +
+                        Environment.NewLine +
+                        Environment.NewLine +
+                        $"\"{trimmedFileName}\"?";
+
+                    if (MessageBox.Show(content, Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                    {
+                        if (currentVideoFile.Tag == null) return;
+                        string? tag = currentVideoFile.Tag?.ToString();
+                        if (tag == null)
+                        {
+                            string warning = "We were unable to find a valid path for the source file, please try again.";
+                            MessageBox.Show(warning, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+
+                        compressSize(tag);
+                    }
+                }
+                else
                 {
                     if (currentVideoFile.Tag == null) return;
                     string? tag = currentVideoFile.Tag?.ToString();
@@ -403,9 +422,25 @@ namespace CompressorK
             }
             else
             {
-                string content = "Compress " + currentVideoFile.Text + $"?";
+                if (chkDisplayConfirmation.Checked)
+                {
+                    string content = "Compress " + currentVideoFile.Text + $"?";
 
-                if (MessageBox.Show(content, Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                    if (MessageBox.Show(content, Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                    {
+                        if (currentVideoFile.Tag == null) return;
+                        string? tag = currentVideoFile.Tag?.ToString();
+                        if (tag == null)
+                        {
+                            string warning = "We were unable to find a valid path for the source file, please try again.";
+                            MessageBox.Show(warning, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+
+                        compressSize(tag);
+                    }
+                }
+                else
                 {
                     if (currentVideoFile.Tag == null) return;
                     string? tag = currentVideoFile.Tag?.ToString();
@@ -809,6 +844,7 @@ namespace CompressorK
 
             Properties.Settings.Default.globalOutputPath = outputPath;
             Properties.Settings.Default.compressionMethod = compressionMethod;
+            Properties.Settings.Default.displayConfirmation = chkDisplayConfirmation.Checked;
             Properties.Settings.Default.Save();
 
             resetTimer?.Stop();
@@ -836,6 +872,7 @@ namespace CompressorK
             }
         }
     }
+
     public class PresetItem
     {
         public string DisplayText { get; set; }

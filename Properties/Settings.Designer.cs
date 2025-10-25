@@ -58,5 +58,17 @@ namespace CompressorK.Properties {
                 this["compressionMethod"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool displayConfirmation {
+            get {
+                return ((bool)(this["displayConfirmation"]));
+            }
+            set {
+                this["displayConfirmation"] = value;
+            }
+        }
     }
 }

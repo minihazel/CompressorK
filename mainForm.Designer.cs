@@ -33,6 +33,7 @@
             dropPanel = new Panel();
             btnReset = new Button();
             boxProgress = new GroupBox();
+            chkDisplayConfirmation = new CheckBox();
             chkFocusWindow = new CheckBox();
             chkOpenSourceDir = new CheckBox();
             btnQuitApp = new Button();
@@ -114,21 +115,35 @@
             // boxProgress
             // 
             boxProgress.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            boxProgress.Controls.Add(chkDisplayConfirmation);
             boxProgress.Controls.Add(chkFocusWindow);
             boxProgress.Controls.Add(chkOpenSourceDir);
-            boxProgress.Location = new Point(3, 326);
+            boxProgress.Location = new Point(3, 311);
             boxProgress.Name = "boxProgress";
-            boxProgress.Size = new Size(285, 84);
+            boxProgress.Size = new Size(285, 99);
             boxProgress.TabIndex = 6;
             boxProgress.TabStop = false;
             boxProgress.Text = " Settings ";
+            // 
+            // chkDisplayConfirmation
+            // 
+            chkDisplayConfirmation.Checked = true;
+            chkDisplayConfirmation.CheckState = CheckState.Checked;
+            chkDisplayConfirmation.Cursor = Cursors.Hand;
+            chkDisplayConfirmation.Location = new Point(9, 69);
+            chkDisplayConfirmation.Name = "chkDisplayConfirmation";
+            chkDisplayConfirmation.Size = new Size(270, 23);
+            chkDisplayConfirmation.TabIndex = 9;
+            chkDisplayConfirmation.Text = "Display confirmation window";
+            formTip.SetToolTip(chkDisplayConfirmation, "Display confirmation window when clicking `Compress video`");
+            chkDisplayConfirmation.UseVisualStyleBackColor = true;
             // 
             // chkFocusWindow
             // 
             chkFocusWindow.Checked = true;
             chkFocusWindow.CheckState = CheckState.Checked;
             chkFocusWindow.Cursor = Cursors.Hand;
-            chkFocusWindow.Location = new Point(9, 48);
+            chkFocusWindow.Location = new Point(9, 43);
             chkFocusWindow.Name = "chkFocusWindow";
             chkFocusWindow.Size = new Size(270, 23);
             chkFocusWindow.TabIndex = 8;
@@ -141,7 +156,7 @@
             chkOpenSourceDir.Checked = true;
             chkOpenSourceDir.CheckState = CheckState.Checked;
             chkOpenSourceDir.Cursor = Cursors.Hand;
-            chkOpenSourceDir.Location = new Point(9, 22);
+            chkOpenSourceDir.Location = new Point(9, 17);
             chkOpenSourceDir.Name = "chkOpenSourceDir";
             chkOpenSourceDir.Size = new Size(270, 23);
             chkOpenSourceDir.TabIndex = 7;
@@ -649,5 +664,6 @@
         private ComboBox listPresets;
         private Label prefixPresets;
         private CheckBox chkFocusWindow;
+        private CheckBox chkDisplayConfirmation;
     }
 }
