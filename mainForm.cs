@@ -460,6 +460,11 @@ namespace CompressorK
         {
             string preset = GetSelectedPreset();
 
+            if (chkMediumPreset.Checked)
+            {
+                preset = "medium";
+            }
+
             if (string.IsNullOrEmpty(filePath)) return;
             string timestamp = DateTime.Now.ToString("yyyy-MM-dd-HH_mm_ss");
 

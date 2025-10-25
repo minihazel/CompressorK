@@ -71,6 +71,7 @@
             warningNotice = new Label();
             label1 = new Label();
             formTip = new ToolTip(components);
+            chkMediumPreset = new CheckBox();
             dropPanel.SuspendLayout();
             boxProgress.SuspendLayout();
             boxFileProperties.SuspendLayout();
@@ -369,6 +370,7 @@
             // compressionPanel
             // 
             compressionPanel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            compressionPanel.Controls.Add(chkMediumPreset);
             compressionPanel.Controls.Add(prefixPresets);
             compressionPanel.Controls.Add(listPresets);
             compressionPanel.Controls.Add(valueTargetFileSize);
@@ -589,6 +591,18 @@
             // 
             formTip.ToolTipTitle = "CompressorK";
             // 
+            // chkMediumPreset
+            // 
+            chkMediumPreset.AutoSize = true;
+            chkMediumPreset.Cursor = Cursors.Hand;
+            chkMediumPreset.Location = new Point(478, 36);
+            chkMediumPreset.Name = "chkMediumPreset";
+            chkMediumPreset.Size = new Size(71, 19);
+            chkMediumPreset.TabIndex = 11;
+            chkMediumPreset.Text = "Medium";
+            formTip.SetToolTip(chkMediumPreset, "Use hardcoded medium preset");
+            chkMediumPreset.UseVisualStyleBackColor = true;
+            // 
             // mainForm
             // 
             AllowDrop = true;
@@ -665,5 +679,6 @@
         private Label prefixPresets;
         private CheckBox chkFocusWindow;
         private CheckBox chkDisplayConfirmation;
+        private CheckBox chkMediumPreset;
     }
 }
