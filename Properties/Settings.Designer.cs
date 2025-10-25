@@ -34,5 +34,29 @@ namespace CompressorK.Properties {
                 this["firstLaunch"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string globalOutputPath {
+            get {
+                return ((string)(this["globalOutputPath"]));
+            }
+            set {
+                this["globalOutputPath"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool compressionMethod {
+            get {
+                return ((bool)(this["compressionMethod"]));
+            }
+            set {
+                this["compressionMethod"] = value;
+            }
+        }
     }
 }

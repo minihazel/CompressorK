@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Management;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Xabe.FFmpeg;
@@ -12,6 +13,144 @@ namespace CompressorK
         public bool isUsingPercentage = false;
         private VideoCompressor? compressor;
         private string inputPath;
+        private string currentFile = string.Empty;
+        private Timer resetTimer;
+
+        public enum GPU_Type
+        {
+            Unknown,
+            NVidia,
+            AMD,
+            Intel
+        };
+
+        public static GPU_Type detectGPU()
+        {
+            try
+            {
+                using (var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_VideoController"))
+                {
+                    foreach (ManagementObject obj in searcher.Get())
+                    {
+                        string name = obj["Name"]?.ToString()?.ToLower() ?? "";
+
+                        if (name.Contains("nvidia") || name.Contains("geforce") || name.Contains("quadro"))
+                            return GPU_Type.NVidia;
+                        else if (name.Contains("amd") || name.Contains("radeon") || name.Contains("ryzen"))
+                            return GPU_Type.AMD;
+                        else if (name.Contains("intel") || name.Contains("uhd") || name.Contains("iris"))
+                            return GPU_Type.Intel;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error detecting GPU: {ex.Message}");
+            }
+
+            return GPU_Type.Unknown;
+        }
+
+        public static string GetPresetForGpu(GPU_Type gpuType, string quality = "balanced")
+        {
+            switch (gpuType)
+            {
+                case GPU_Type.NVidia:
+                    // nvenc presets: p1 (fastest), p7 (slowest)
+                    return quality switch
+                    {
+                        "fast" => "p1",
+                        "balanced" => "p4",
+                        "quality" => "p6",
+                        _ => "p4"
+                    };
+
+                case GPU_Type.Intel:
+                    // qsv, similar to software
+                    return quality switch
+                    {
+                        "fast" => "veryfast",
+                        "balanced" => "medium",
+                        "quality" => "slow",
+                        _ => "medium"
+                    };
+
+                case GPU_Type.AMD:
+                    // amf presets
+                    return quality switch
+                    {
+                        "fast" => "speed",
+                        "balanced" => "balanced",
+                        "quality" => "quality",
+                        _ => "balanced"
+                    };
+
+                default:
+                    // (libx264/libx265)
+                    return quality switch
+                    {
+                        "fast" => "veryfast",
+                        "balanced" => "medium",
+                        "quality" => "slow",
+                        _ => "medium"
+                    };
+            }
+        }
+
+        private void PopulatePresets()
+        {
+            listPresets.Items.Clear();
+            var gpuType = detectGPU();
+
+            switch (gpuType)
+            {
+                case GPU_Type.NVidia:
+                    listPresets.Items.Add(new PresetItem { DisplayText = "Fastest (P1)", Value = "p1" });
+                    listPresets.Items.Add(new PresetItem { DisplayText = "Fast (P3)", Value = "p3" });
+                    listPresets.Items.Add(new PresetItem { DisplayText = "Balanced (P4)", Value = "p4" });
+                    listPresets.Items.Add(new PresetItem { DisplayText = "Quality (P6)", Value = "p6" });
+                    listPresets.Items.Add(new PresetItem { DisplayText = "Best Quality (P7)", Value = "p7" });
+                    listPresets.SelectedIndex = 2; // Default to Balanced
+                    break;
+
+                case GPU_Type.Intel:
+                    listPresets.Items.Add(new PresetItem { DisplayText = "Very Fast", Value = "veryfast" });
+                    listPresets.Items.Add(new PresetItem { DisplayText = "Fast", Value = "fast" });
+                    listPresets.Items.Add(new PresetItem { DisplayText = "Balanced", Value = "medium" });
+                    listPresets.Items.Add(new PresetItem { DisplayText = "Slow (Better Quality)", Value = "slow" });
+                    listPresets.Items.Add(new PresetItem { DisplayText = "Very Slow", Value = "veryslow" });
+                    listPresets.SelectedIndex = 2; // Default to Balanced
+                    break;
+
+                case GPU_Type.AMD:
+                    listPresets.Items.Add(new PresetItem { DisplayText = "Speed", Value = "speed" });
+                    listPresets.Items.Add(new PresetItem { DisplayText = "Balanced", Value = "balanced" });
+                    listPresets.Items.Add(new PresetItem { DisplayText = "Quality", Value = "quality" });
+                    listPresets.SelectedIndex = 1; // Default to Balanced
+                    break;
+
+                default: // software
+                    listPresets.Items.Add(new PresetItem { DisplayText = "Ultra Fast", Value = "ultrafast" });
+                    listPresets.Items.Add(new PresetItem { DisplayText = "Very Fast", Value = "veryfast" });
+                    listPresets.Items.Add(new PresetItem { DisplayText = "Fast", Value = "fast" });
+                    listPresets.Items.Add(new PresetItem { DisplayText = "Balanced", Value = "medium" });
+                    listPresets.Items.Add(new PresetItem { DisplayText = "Slow (Better Quality)", Value = "slow" });
+                    listPresets.Items.Add(new PresetItem { DisplayText = "Very Slow", Value = "veryslow" });
+                    listPresets.SelectedIndex = 3; // Default to Balanced
+                    break;
+            }
+        }
+
+        public string GetSelectedPreset()
+        {
+            if (listPresets.SelectedItem is PresetItem item)
+            {
+                return item.Value;
+            }
+
+            var gpuType = detectGPU();
+            return GetPresetForGpu(gpuType, "balanced");
+        }
 
         public mainForm()
         {
@@ -65,6 +204,16 @@ namespace CompressorK
                 warningNotice.Visible = true;
                 Properties.Settings.Default.firstLaunch = false;
                 Properties.Settings.Default.Save();
+
+                chkUseFileSize.Checked = Properties.Settings.Default.compressionMethod;
+                if (string.IsNullOrEmpty(Properties.Settings.Default.globalOutputPath)) return;
+
+                bool directoryExists = Directory.Exists(Properties.Settings.Default.globalOutputPath);
+                if (directoryExists)
+                {
+                    valueOutputFolder.Text = Properties.Settings.Default.globalOutputPath;
+                }
+
             }
         }
 
@@ -137,10 +286,12 @@ namespace CompressorK
 
             valueTargetPercentage.Value = 50;
             suffixTargetPercentage.Text = valueTargetPercentage.Value.ToString();
+            suffixTargetFileSize.Text = "MB   (" + maximumFileSize.ToString() + "MB)";
 
             string userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             string downloads = Path.Join(userProfile, "Downloads");
             valueOutputFolder.Text = downloads;
+            PopulatePresets();
 
             dropPanel.BringToFront();
             btnCompressVideo.Focus();
@@ -155,6 +306,7 @@ namespace CompressorK
                 valueTargetFileSize.Enabled = false;
                 valueTargetPercentage.Enabled = true;
                 suffixTargetPercentage.Enabled = true;
+                listPresets.Enabled = false;
             }
             else
             {
@@ -164,6 +316,7 @@ namespace CompressorK
                 valueTargetPercentage.Enabled = false;
                 suffixTargetPercentage.Enabled = false;
                 suffixTargetPercentage.Text = valueTargetPercentage.Value.ToString();
+                listPresets.Enabled = true;
             }
         }
 
@@ -271,6 +424,8 @@ namespace CompressorK
 
         private async void compressSize(string filePath)
         {
+            string preset = GetSelectedPreset();
+
             if (string.IsNullOrEmpty(filePath)) return;
             string timestamp = DateTime.Now.ToString("yyyy-MM-dd-HH_mm_ss");
 
@@ -342,7 +497,7 @@ namespace CompressorK
             {
                 int targetPercentage = (int)valueTargetPercentage.Value;
 
-                await CompressVideo(() => compressor.CompressToPercentage(filePath, outputPath, targetPercentage), outputPath);
+                await CompressVideo(() => compressor.CompressToPercentage(filePath, outputPath, targetPercentage, preset), outputPath);
                 return;
             }
 
@@ -353,7 +508,8 @@ namespace CompressorK
                 return;
             }
 
-            await CompressVideo(() => compressor.CompressToTargetSize(filePath, outputPath, targetSizeInMB), outputPath);
+            currentFile = outputPath;
+            await CompressVideo(() => compressor.CompressToTargetSize(filePath, outputPath, targetSizeInMB, preset), outputPath);
             return;
         }
 
@@ -372,24 +528,34 @@ namespace CompressorK
                 btnCompressVideo.Text = "✔️ Compress video";
                 topPanel.BackColor = Color.MediumSpringGreen;
 
-                Timer tmr = new Timer();
-                tmr.Interval = 3000;
+                resetTimer?.Stop();
+                resetTimer?.Dispose();
 
-                tmr.Tick += (_,_) =>
+                resetTimer = new Timer();
+                resetTimer.Interval = 3000;
+
+                resetTimer.Tick += (_, _) =>
                 {
                     topPanel.BackColor = SystemColors.ScrollBar;
+                    resetTimer?.Stop();
+                    resetTimer?.Dispose();
                 };
+
+                resetTimer.Start();
 
                 btnCompressVideo.Enabled = true;
                 btnQuitApp.Enabled = true;
                 btnReset.Enabled = true;
 
-                if (chkOpenSourceDir.Checked)
+                if (chkOpenSourceDir.Checked && !this.IsDisposed && this.Visible)
                 {
                     openSourceDir(outputPath);
                 }
 
-                await Task.Delay(3000);
+                if (chkFocusWindow.Checked && WindowState == FormWindowState.Minimized)
+                {
+                    Show();
+                }
             }
             catch (Exception ex)
             {
@@ -399,12 +565,18 @@ namespace CompressorK
 
         private void Compressor_ProgressChanged(object sender, int percent)
         {
-            if (InvokeRequired)
+            try
             {
-                Invoke(new Action(() =>
+                if (InvokeRequired)
                 {
-                    btnCompressVideo.Text = $"{percent}%";
-                }));
+                    Invoke(new Action(() =>
+                    {
+                        btnCompressVideo.Text = $"{percent}%";
+                    }));
+                }
+            }
+            catch (Exception ex)
+            {
             }
         }
 
@@ -457,19 +629,26 @@ namespace CompressorK
                 suffixFileName.Text = "->";
 
                 valueTargetFileSize.Maximum = 10;
-                valueTargetFileSize.Value = valueTargetFileSize.Maximum;
-                valueTargetFileSize.Enabled = false;
+                valueTargetFileSize.Value = valueTargetFileSize.Maximum / 2;
+                valueTargetFileSize.Enabled = true;
 
                 valueTargetPercentage.Value = 50;
                 suffixTargetPercentage.Text = valueTargetPercentage.Value.ToString();
+                valueTargetPercentage.Enabled = false;
 
-                chkUseFileSize.Checked = true;
+                chkUseFileSize.Checked = false;
                 chkUseSourceDir.Checked = true;
+                chkUseSourceFileName.Checked = true;
                 chkIncludeTimestamp.Checked = false;
-                chkOpenSourceDir.Checked = false;
+                chkOpenSourceDir.Checked = true;
+
+                btnFetchFileName.Enabled = false;
+                btnBrowseOutputFolder.Enabled = false;
 
                 valueOutputFolder.Text = string.Empty;
                 btnCompressVideo.Text = "✔️ Compress video"; ;
+                currentFile = string.Empty;
+                listPresets.Items.Clear();
 
                 compressor = null;
                 optionsPanel.BringToFront();
@@ -609,5 +788,59 @@ namespace CompressorK
             valueTargetPercentage.Value = snappedValue;
             suffixTargetPercentage.Text = snappedValue.ToString();
         }
+
+        private void chkUseSourceFileName_CheckedChanged(object sender, EventArgs e)
+        {
+            if (chkUseSourceFileName.Checked)
+            {
+                valueFileName.Enabled = false;
+                btnFetchFileName.Enabled = false;
+            }
+            else
+            {
+                valueFileName.Enabled = true;
+                btnFetchFileName.Enabled = true;
+            }
+        }
+
+        private void mainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            string outputPath = valueOutputFolder.Text;
+            bool compressionMethod = chkUseFileSize.Checked;
+
+            Properties.Settings.Default.globalOutputPath = outputPath;
+            Properties.Settings.Default.compressionMethod = compressionMethod;
+            Properties.Settings.Default.Save();
+
+            resetTimer?.Stop();
+            resetTimer?.Dispose();
+
+            foreach (var process in Process.GetProcessesByName("ffmpeg"))
+            {
+                try
+                {
+                    process.Kill();
+                    process.WaitForExit(1000);
+                }
+                catch { }
+            }
+
+            string file = currentFile;
+            bool fileExists = File.Exists(file);
+            if (fileExists)
+            {
+                try
+                {
+                    File.Delete(file);
+                }
+                catch { }
+            }
+        }
+    }
+    public class PresetItem
+    {
+        public string DisplayText { get; set; }
+        public string Value { get; set; }
+        public override string ToString() => DisplayText;
     }
 }

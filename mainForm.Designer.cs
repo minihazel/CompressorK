@@ -31,15 +31,14 @@
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(mainForm));
             dropPanel = new Panel();
-            statusProgress = new Label();
             btnReset = new Button();
             boxProgress = new GroupBox();
-            checkBox1 = new CheckBox();
             chkOpenSourceDir = new CheckBox();
             btnQuitApp = new Button();
             btnCompressVideo = new Button();
             boxFileProperties = new GroupBox();
             propertiesPanel = new Panel();
+            chkUseSourceFileName = new CheckBox();
             lblTimestampFormat = new Label();
             btnFetchFileName = new Button();
             chkUseSourceDir = new CheckBox();
@@ -52,6 +51,8 @@
             suffixFileName = new Label();
             boxCompressionSettings = new GroupBox();
             compressionPanel = new Panel();
+            prefixPresets = new Label();
+            listPresets = new ComboBox();
             valueTargetFileSize = new NumericUpDown();
             suffixTargetPercentage2 = new Label();
             suffixTargetPercentage = new TextBox();
@@ -68,6 +69,8 @@
             warningNotice = new Label();
             label1 = new Label();
             formTip = new ToolTip(components);
+            checkBox1 = new CheckBox();
+            chkFocusWindow = new CheckBox();
             dropPanel.SuspendLayout();
             boxProgress.SuspendLayout();
             boxFileProperties.SuspendLayout();
@@ -83,7 +86,6 @@
             // dropPanel
             // 
             dropPanel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            dropPanel.Controls.Add(statusProgress);
             dropPanel.Controls.Add(btnReset);
             dropPanel.Controls.Add(boxProgress);
             dropPanel.Controls.Add(btnQuitApp);
@@ -94,19 +96,6 @@
             dropPanel.Name = "dropPanel";
             dropPanel.Size = new Size(629, 422);
             dropPanel.TabIndex = 0;
-            // 
-            // statusProgress
-            // 
-            statusProgress.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            statusProgress.BackColor = Color.Transparent;
-            statusProgress.Font = new Font("Segoe UI", 10F);
-            statusProgress.Location = new Point(326, 380);
-            statusProgress.Name = "statusProgress";
-            statusProgress.Size = new Size(49, 20);
-            statusProgress.TabIndex = 5;
-            statusProgress.Text = "50%";
-            statusProgress.TextAlign = ContentAlignment.MiddleCenter;
-            statusProgress.Visible = false;
             // 
             // btnReset
             // 
@@ -126,7 +115,7 @@
             // boxProgress
             // 
             boxProgress.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            boxProgress.Controls.Add(checkBox1);
+            boxProgress.Controls.Add(chkFocusWindow);
             boxProgress.Controls.Add(chkOpenSourceDir);
             boxProgress.Location = new Point(3, 326);
             boxProgress.Name = "boxProgress";
@@ -134,19 +123,6 @@
             boxProgress.TabIndex = 6;
             boxProgress.TabStop = false;
             boxProgress.Text = " Settings ";
-            // 
-            // checkBox1
-            // 
-            checkBox1.Checked = true;
-            checkBox1.CheckState = CheckState.Checked;
-            checkBox1.Cursor = Cursors.Hand;
-            checkBox1.Location = new Point(9, 51);
-            checkBox1.Name = "checkBox1";
-            checkBox1.Size = new Size(270, 23);
-            checkBox1.TabIndex = 8;
-            checkBox1.Text = "Notify me when finished";
-            formTip.SetToolTip(checkBox1, "Notify the user when the download is complete");
-            checkBox1.UseVisualStyleBackColor = true;
             // 
             // chkOpenSourceDir
             // 
@@ -203,6 +179,7 @@
             // propertiesPanel
             // 
             propertiesPanel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            propertiesPanel.Controls.Add(chkUseSourceFileName);
             propertiesPanel.Controls.Add(lblTimestampFormat);
             propertiesPanel.Controls.Add(btnFetchFileName);
             propertiesPanel.Controls.Add(chkUseSourceDir);
@@ -217,6 +194,21 @@
             propertiesPanel.Name = "propertiesPanel";
             propertiesPanel.Size = new Size(611, 127);
             propertiesPanel.TabIndex = 0;
+            // 
+            // chkUseSourceFileName
+            // 
+            chkUseSourceFileName.AutoSize = true;
+            chkUseSourceFileName.Checked = true;
+            chkUseSourceFileName.CheckState = CheckState.Checked;
+            chkUseSourceFileName.Cursor = Cursors.Hand;
+            chkUseSourceFileName.Location = new Point(188, 65);
+            chkUseSourceFileName.Name = "chkUseSourceFileName";
+            chkUseSourceFileName.Size = new Size(135, 19);
+            chkUseSourceFileName.TabIndex = 13;
+            chkUseSourceFileName.Text = "Use source file name";
+            formTip.SetToolTip(chkUseSourceFileName, "Output the converted video into the same folder as the original video");
+            chkUseSourceFileName.UseVisualStyleBackColor = true;
+            chkUseSourceFileName.CheckedChanged += chkUseSourceFileName_CheckedChanged;
             // 
             // lblTimestampFormat
             // 
@@ -233,6 +225,7 @@
             // 
             btnFetchFileName.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             btnFetchFileName.Cursor = Cursors.Hand;
+            btnFetchFileName.Enabled = false;
             btnFetchFileName.Font = new Font("Segoe UI", 11F);
             btnFetchFileName.Location = new Point(566, 1);
             btnFetchFileName.Name = "btnFetchFileName";
@@ -308,6 +301,7 @@
             // valueFileName
             // 
             valueFileName.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            valueFileName.Enabled = false;
             valueFileName.Location = new Point(163, 4);
             valueFileName.Name = "valueFileName";
             valueFileName.PlaceholderText = "My awesome video";
@@ -348,6 +342,9 @@
             // compressionPanel
             // 
             compressionPanel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            compressionPanel.Controls.Add(checkBox1);
+            compressionPanel.Controls.Add(prefixPresets);
+            compressionPanel.Controls.Add(listPresets);
             compressionPanel.Controls.Add(valueTargetFileSize);
             compressionPanel.Controls.Add(suffixTargetPercentage2);
             compressionPanel.Controls.Add(suffixTargetPercentage);
@@ -361,9 +358,27 @@
             compressionPanel.Size = new Size(611, 101);
             compressionPanel.TabIndex = 0;
             // 
+            // prefixPresets
+            // 
+            prefixPresets.Location = new Point(379, 3);
+            prefixPresets.Name = "prefixPresets";
+            prefixPresets.Size = new Size(93, 23);
+            prefixPresets.TabIndex = 10;
+            prefixPresets.Text = "Codec Preset:";
+            prefixPresets.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // listPresets
+            // 
+            listPresets.DropDownStyle = ComboBoxStyle.DropDownList;
+            listPresets.Font = new Font("Segoe UI", 10F);
+            listPresets.FormattingEnabled = true;
+            listPresets.Location = new Point(478, 3);
+            listPresets.Name = "listPresets";
+            listPresets.Size = new Size(130, 25);
+            listPresets.TabIndex = 9;
+            // 
             // valueTargetFileSize
             // 
-            valueTargetFileSize.Enabled = false;
             valueTargetFileSize.Font = new Font("Segoe UI", 10F);
             valueTargetFileSize.Location = new Point(163, 3);
             valueTargetFileSize.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
@@ -376,17 +391,18 @@
             // suffixTargetPercentage2
             // 
             suffixTargetPercentage2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            suffixTargetPercentage2.Location = new Point(583, 64);
+            suffixTargetPercentage2.Location = new Point(272, 64);
             suffixTargetPercentage2.Name = "suffixTargetPercentage2";
-            suffixTargetPercentage2.Size = new Size(25, 23);
+            suffixTargetPercentage2.Size = new Size(336, 23);
             suffixTargetPercentage2.TabIndex = 7;
-            suffixTargetPercentage2.Text = "%";
+            suffixTargetPercentage2.Text = "% of the file size";
             suffixTargetPercentage2.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // suffixTargetPercentage
             // 
             suffixTargetPercentage.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            suffixTargetPercentage.Location = new Point(538, 64);
+            suffixTargetPercentage.Enabled = false;
+            suffixTargetPercentage.Location = new Point(227, 64);
             suffixTargetPercentage.Name = "suffixTargetPercentage";
             suffixTargetPercentage.Size = new Size(39, 23);
             suffixTargetPercentage.TabIndex = 4;
@@ -396,8 +412,6 @@
             // chkUseFileSize
             // 
             chkUseFileSize.AutoSize = true;
-            chkUseFileSize.Checked = true;
-            chkUseFileSize.CheckState = CheckState.Checked;
             chkUseFileSize.Cursor = Cursors.Hand;
             chkUseFileSize.Location = new Point(7, 36);
             chkUseFileSize.Name = "chkUseFileSize";
@@ -412,11 +426,12 @@
             // 
             valueTargetPercentage.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             valueTargetPercentage.AutoSize = false;
-            valueTargetPercentage.Location = new Point(157, 66);
+            valueTargetPercentage.Enabled = false;
+            valueTargetPercentage.Location = new Point(59, 66);
             valueTargetPercentage.Maximum = 99;
             valueTargetPercentage.Minimum = 1;
             valueTargetPercentage.Name = "valueTargetPercentage";
-            valueTargetPercentage.Size = new Size(375, 20);
+            valueTargetPercentage.Size = new Size(162, 20);
             valueTargetPercentage.TabIndex = 4;
             valueTargetPercentage.TickStyle = TickStyle.None;
             formTip.SetToolTip(valueTargetPercentage, "How much in percent of the original file should be retained?\r\n\r\nA value of 90% will retain 90% of the file, and apply 10% compression. May not be 100% accurate.");
@@ -429,18 +444,18 @@
             // 
             suffixTargetFileSize.Location = new Point(272, 3);
             suffixTargetFileSize.Name = "suffixTargetFileSize";
-            suffixTargetFileSize.Size = new Size(42, 23);
+            suffixTargetFileSize.Size = new Size(101, 23);
             suffixTargetFileSize.TabIndex = 3;
-            suffixTargetFileSize.Text = "MB";
+            suffixTargetFileSize.Text = "MB (428MB)";
             suffixTargetFileSize.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // lblTargetPercentage
             // 
             lblTargetPercentage.Location = new Point(3, 63);
             lblTargetPercentage.Name = "lblTargetPercentage";
-            lblTargetPercentage.Size = new Size(154, 23);
+            lblTargetPercentage.Size = new Size(50, 23);
             lblTargetPercentage.TabIndex = 1;
-            lblTargetPercentage.Text = "Retain % of target file size:";
+            lblTargetPercentage.Text = "Keep:";
             lblTargetPercentage.TextAlign = ContentAlignment.MiddleLeft;
             formTip.SetToolTip(lblTargetPercentage, "How much in percent of the original file should be retained?\r\n\r\nA value of 90% will retain 90% of the file, and apply 10% compression. May not be 100% accurate.\r\n");
             // 
@@ -548,6 +563,31 @@
             // 
             formTip.ToolTipTitle = "CompressorK";
             // 
+            // checkBox1
+            // 
+            checkBox1.AutoSize = true;
+            checkBox1.Cursor = Cursors.Hand;
+            checkBox1.Location = new Point(478, 36);
+            checkBox1.Name = "checkBox1";
+            checkBox1.Size = new Size(146, 19);
+            checkBox1.TabIndex = 11;
+            checkBox1.Text = "Use software encoding";
+            formTip.SetToolTip(checkBox1, "Toggle between targeting a specific file size or targeting how much compression in percent should be applied");
+            checkBox1.UseVisualStyleBackColor = true;
+            // 
+            // chkFocusWindow
+            // 
+            chkFocusWindow.Checked = true;
+            chkFocusWindow.CheckState = CheckState.Checked;
+            chkFocusWindow.Cursor = Cursors.Hand;
+            chkFocusWindow.Location = new Point(9, 48);
+            chkFocusWindow.Name = "chkFocusWindow";
+            chkFocusWindow.Size = new Size(270, 23);
+            chkFocusWindow.TabIndex = 8;
+            chkFocusWindow.Text = "Focus window on completion";
+            formTip.SetToolTip(chkFocusWindow, "Bring the app window up when the download is finished");
+            chkFocusWindow.UseVisualStyleBackColor = true;
+            // 
             // mainForm
             // 
             AllowDrop = true;
@@ -564,6 +604,7 @@
             Name = "mainForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "CompressorK";
+            FormClosing += mainForm_FormClosing;
             Load += mainForm_Load;
             dropPanel.ResumeLayout(false);
             boxProgress.ResumeLayout(false);
@@ -605,7 +646,6 @@
         private Label suffixTargetPercentage2;
         private Button btnQuitApp;
         private GroupBox boxProgress;
-        private Label statusProgress;
         private CheckBox chkOpenSourceDir;
         private CheckBox chkIncludeTimestamp;
         private TextBox valueOutputFolder;
@@ -619,6 +659,10 @@
         private Label lblTimestampFormat;
         private Label warningNotice;
         private Button btnResetWarning;
+        private CheckBox chkUseSourceFileName;
+        private ComboBox listPresets;
+        private Label prefixPresets;
         private CheckBox checkBox1;
+        private CheckBox chkFocusWindow;
     }
 }
