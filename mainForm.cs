@@ -9,12 +9,21 @@ namespace CompressorK
 {
     public partial class mainForm : Form
     {
+        // strings
         public string currentEnv = Environment.CurrentDirectory;
-        public bool isUsingPercentage = false;
-        private VideoCompressor? compressor;
+        public string compressedFile = string.Empty;
         private string inputPath;
         private string currentFile = string.Empty;
+
+        // timer
         private Timer resetTimer;
+
+        // custom
+        private VideoCompressor? compressor;
+
+        // bools
+        public bool isCompressing = false;
+        public bool isUsingPercentage = false;
 
         public enum GPU_Type
         {
@@ -363,6 +372,7 @@ namespace CompressorK
 
         private void btnQuitApp_Click(object sender, EventArgs e)
         {
+            executeExitFunction();
             Application.Exit();
         }
 
@@ -458,6 +468,7 @@ namespace CompressorK
 
         private async void compressSize(string filePath)
         {
+            if (compressor == null) return;
             string preset = GetSelectedPreset();
 
             if (chkMediumPreset.Checked)
@@ -554,9 +565,10 @@ namespace CompressorK
 
         private async Task CompressVideo(Func<Task> compressionTask, string outputPath)
         {
-            btnQuitApp.Enabled = false;
+            isCompressing = true;
             btnReset.Enabled = false;
             btnCompressVideo.Enabled = false;
+            topPanel.BackColor = Color.DarkOrange;
 
             btnCompressVideo.Text = "Compressing...";
 
@@ -585,6 +597,7 @@ namespace CompressorK
                 btnCompressVideo.Enabled = true;
                 btnQuitApp.Enabled = true;
                 btnReset.Enabled = true;
+                isCompressing = false;
 
                 if (chkOpenSourceDir.Checked && !this.IsDisposed && this.Visible)
                 {
@@ -843,14 +856,15 @@ namespace CompressorK
             }
         }
 
-        private void mainForm_FormClosing(object sender, FormClosingEventArgs e)
+        private void executeExitFunction()
         {
             string outputPath = valueOutputFolder.Text;
             bool compressionMethod = chkUseFileSize.Checked;
+            bool displayConfirmation = chkDisplayConfirmation.Checked;
 
             Properties.Settings.Default.globalOutputPath = outputPath;
             Properties.Settings.Default.compressionMethod = compressionMethod;
-            Properties.Settings.Default.displayConfirmation = chkDisplayConfirmation.Checked;
+            Properties.Settings.Default.displayConfirmation = displayConfirmation;
             Properties.Settings.Default.Save();
 
             resetTimer?.Stop();
@@ -868,13 +882,30 @@ namespace CompressorK
 
             string file = currentFile;
             bool fileExists = File.Exists(file);
-            if (fileExists)
+            if (fileExists && isCompressing)
             {
                 try
                 {
                     File.Delete(file);
                 }
                 catch { }
+            }
+        }
+
+        private void mainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            executeExitFunction();
+        }
+
+        private void chkDisplayConfirmation_CheckedChanged(object sender, EventArgs e)
+        {
+            if (chkDisplayConfirmation.Checked)
+            {
+                Properties.Settings.Default.displayConfirmation = true;
+            }
+            else
+            {
+                Properties.Settings.Default.displayConfirmation = false;
             }
         }
     }

@@ -53,6 +53,7 @@
             suffixFileName = new Label();
             boxCompressionSettings = new GroupBox();
             compressionPanel = new Panel();
+            chkMediumPreset = new CheckBox();
             prefixPresets = new Label();
             listPresets = new ComboBox();
             valueTargetFileSize = new NumericUpDown();
@@ -71,7 +72,6 @@
             warningNotice = new Label();
             label1 = new Label();
             formTip = new ToolTip(components);
-            chkMediumPreset = new CheckBox();
             dropPanel.SuspendLayout();
             boxProgress.SuspendLayout();
             boxFileProperties.SuspendLayout();
@@ -138,6 +138,7 @@
             chkDisplayConfirmation.Text = "Display confirmation window";
             formTip.SetToolTip(chkDisplayConfirmation, "Display confirmation window when clicking `Compress video`");
             chkDisplayConfirmation.UseVisualStyleBackColor = true;
+            chkDisplayConfirmation.CheckedChanged += chkDisplayConfirmation_CheckedChanged;
             // 
             // chkFocusWindow
             // 
@@ -386,6 +387,18 @@
             compressionPanel.Size = new Size(611, 101);
             compressionPanel.TabIndex = 0;
             // 
+            // chkMediumPreset
+            // 
+            chkMediumPreset.AutoSize = true;
+            chkMediumPreset.Cursor = Cursors.Hand;
+            chkMediumPreset.Location = new Point(478, 36);
+            chkMediumPreset.Name = "chkMediumPreset";
+            chkMediumPreset.Size = new Size(71, 19);
+            chkMediumPreset.TabIndex = 11;
+            chkMediumPreset.Text = "Medium";
+            formTip.SetToolTip(chkMediumPreset, "Use hardcoded medium preset");
+            chkMediumPreset.UseVisualStyleBackColor = true;
+            // 
             // prefixPresets
             // 
             prefixPresets.Location = new Point(379, 3);
@@ -590,18 +603,6 @@
             // formTip
             // 
             formTip.ToolTipTitle = "CompressorK";
-            // 
-            // chkMediumPreset
-            // 
-            chkMediumPreset.AutoSize = true;
-            chkMediumPreset.Cursor = Cursors.Hand;
-            chkMediumPreset.Location = new Point(478, 36);
-            chkMediumPreset.Name = "chkMediumPreset";
-            chkMediumPreset.Size = new Size(71, 19);
-            chkMediumPreset.TabIndex = 11;
-            chkMediumPreset.Text = "Medium";
-            formTip.SetToolTip(chkMediumPreset, "Use hardcoded medium preset");
-            chkMediumPreset.UseVisualStyleBackColor = true;
             // 
             // mainForm
             // 

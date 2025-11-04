@@ -63,12 +63,14 @@ namespace CompressorK
 
         public async Task CompressToTargetSize(string inputPath, string outputPath, int targetSizeMB, string preset)
         {
-            var mediaInfo = await FFmpeg.GetMediaInfo(inputPath);
+            IMediaInfo? mediaInfo = await FFmpeg.GetMediaInfo(inputPath);
             var gpuType = detectGPU();
             string codec = getHardwareCodec(gpuType);
             var video = mediaInfo.VideoStreams.First().SetCodec(codec);
-            var audio = mediaInfo.AudioStreams.FirstOrDefault();
+            IAudioStream? audio = mediaInfo.AudioStreams.FirstOrDefault();
 
+            if (audio == null)
+                throw new Exception("No audio stream found in the file");
             if (video == null)
                 throw new Exception("No video stream found in the file");
 
@@ -88,6 +90,7 @@ namespace CompressorK
 
             var conversion = FFmpeg.Conversions.New();
             conversion.AddStream(video);
+            conversion.SetAudioBitrate(audioBitrate);
             conversion.SetVideoBitrate(videoBitrate * 1000);
             conversion.AddParameter("-c:a copy");
             conversion.AddParameter($"-preset {preset}");
